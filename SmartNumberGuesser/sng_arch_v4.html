@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Defensa - Smart Number Guesser V4.0 (Dev Dashboard Edition)</title>
+    <style>
+        /* --- ESTILOS EN PANTALLA (MODO OSCURO STYLE VELADA) --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f1f5f9;
+            background-color: #090d16;
+            margin: 0;
+            padding: 0;
+            overflow-y: scroll;
+        }
+        
+        /* --- HEADER Y PERFIL --- */
+        .header-wrapper {
+            background-color: #111827;
+            border-bottom: 1px solid #1f2937;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .project-title {
+            font-weight: 800;
+            color: #38bdf8;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .profile-box {
+            background: #070a12;
+            border: 1px solid #1f2937;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .profile-input {
+            background: #1f2937;
+            border: 1px solid #4b5563;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            width: 110px;
+            font-size: 12px;
+        }
+
+        .nav-container {
+            background-color: #111827;
+            padding: 5px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            border-bottom: 1px solid #1f2937;
+        }
+
+        .tab-radio {
+            display: none;
+        }
+        .tab-label {
+            display: inline-block;
+            padding: 12px 20px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #4b5563;
+            border-bottom: 3px solid transparent;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+        .tab-label:hover {
+            color: #38bdf8;
+        }
+
+        .main-content {
+            max-width: 950px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        @keyframes veladaReveal {
+            0% { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        .page {
+            background-color: #111827; 
+            padding: 45px;
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            display: none; 
+            box-sizing: border-box;
+        }
+
+        /* Control de Pestañas activas */
+        #btn-doc1:checked ~ .nav-container .label-doc1,
+        #btn-doc2:checked ~ .nav-container .label-doc2,
+        #btn-bugs:checked ~ .nav-container .label-bugs,
+        #btn-sim:checked ~ .nav-container .label-sim,
+        #btn-dev:checked ~ .nav-container .label-dev {
+            color: #38bdf8;
+            border-bottom-color: #38bdf8;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+
+        #btn-doc1:checked ~ .main-content .content-doc1,
+        #btn-doc2:checked ~ .main-content .content-doc2,
+        #btn-bugs:checked ~ .main-content .content-bugs,
+        #btn-sim:checked ~ .main-content .content-sim,
+        #btn-dev:checked ~ .main-content .content-dev { 
+            display: block; 
+            animation: veladaReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            filter: blur(8px);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+        }
+
+        .scroll-reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+
+        /* Estilos de Contenido Base */
+        h1 { color: #38bdf8; font-size: 28px; border-bottom: 2px solid #1f2937; padding-bottom: 12px; text-transform: uppercase; margin-top: 0; }
+        h2 { color: #34d399; font-size: 20px; margin-top: 35px; border-bottom: 1px solid #1f2937; padding-bottom: 8px; }
+        .meta-box { background-color: #070a12; border-left: 4px solid #38bdf8; padding: 18px; margin-bottom: 35px; border-radius: 6px; }
+        .meta-box p { margin: 6px 0; font-size: 14px; font-weight: bold; color: #9ca3af; }
+        .badge { background-color: #1f2937; color: #38bdf8; padding: 3px 8px; border-radius: 4px; font-size: 13px; font-family: monospace; }
+        p, li { text-align: justify; color: #cbd5e1; line-height: 1.7; }
+        strong { color: #fff; }
+
+        /* Estilos del Componente de Simulación */
+        .game-box { background: #070a12; padding: 30px; border-radius: 8px; border: 1px dashed #38bdf8; text-align: center; margin-bottom: 25px; }
+        .hearts { font-size: 32px; margin-bottom: 10px; letter-spacing: 5px; display: inline-block; vertical-align: middle; }
+        .game-input { background: #1f2937; border: 2px solid #4b5563; color: #fff; font-size: 24px; padding: 10px; border-radius: 6px; width: 220px; text-align: center; outline: none; transition: border 0.3s; display: inline-block; vertical-align: middle; }
+        .game-input:focus { border-color: #38bdf8; }
+        .game-btn { background: #38bdf8; color: #090d16; border: none; font-size: 18px; font-weight: bold; padding: 12px 30px; margin-left: 10px; border-radius: 6px; cursor: pointer; transition: background 0.3s; display: inline-block; vertical-align: middle; }
+        .game-btn:hover { background: #0ea5e9; }
+        .console-output { margin-top: 25px; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 15px; min-height: 65px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .msg-error { background: rgba(239, 68, 68, 0.15); color: #f87171; border-left: 4px solid #ef4444; }
+        .msg-geek { background: rgba(52, 211, 153, 0.15); color: #34d399; border-left: 4px solid #34d399; }
+        .msg-normal { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-left: 4px solid #38bdf8; }
+
+        /* --- MARCADORES EXTENDIDOS --- */
+        .stats-container { display: flex; flex-wrap: wrap; justify-content: space-around; background: #111827; padding: 15px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #1f2937; gap: 10px; }
+        .stat-card { text-align: center; min-width: 120px; }
+        .stat-val { font-size: 22px; font-weight: bold; color: #34d399; font-family: monospace; }
+        .stat-lbl { font-size: 11px; text-transform: uppercase; color: #9ca3af; letter-spacing: 1px; margin-top: 4px; }
+
+        /* --- ARQUITECTURA DE TUTORIAL (TOOLTIPS) --- */
+        .tutorial-hub { display: inline-block; position: relative; margin-left: 6px; vertical-align: middle; }
+        .help-icon { background: #3b82f6; color: #fff; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 11px; font-weight: bold; cursor: help; transition: background 0.3s, transform 0.3s; }
+        .help-icon:hover { background: #60a5fa; transform: scale(1.2); }
+        
+        .tooltip-box { display: none; position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%); width: 260px; background: #1f2937; color: #cbd5e1; padding: 12px; border-radius: 6px; font-size: 13px; font-family: 'Segoe UI', sans-serif; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.7); border: 1px solid #3b82f6; z-index: 500; line-height: 1.4; pointer-events: none; }
+        .tooltip-box::after { content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 6px; border-style: solid; border-color: #1f2937 transparent transparent transparent; }
+        .tutorial-hub:hover .tooltip-box { display: block; animation: veladaReveal 0.2s ease-out forwards; }
+
+        /* --- TABLA DE CLASIFICACIÓN (LEADERBOARD) --- */
+        .leaderboard-box { background: #070a12; border: 1px solid #1f2937; border-radius: 8px; padding: 20px; margin-top: 25px; }
+        .leaderboard-title { font-size: 16px; color: #38bdf8; text-transform: uppercase; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #1f2937; padding-bottom: 5px; text-align: left; }
+        .leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        .leaderboard-table th { color: #9ca3af; font-weight: 600; padding: 10px; border-bottom: 2px solid #1f2937; text-transform: uppercase; font-size: 11px; }
+        .leaderboard-table td { padding: 10px; border-bottom: 1px solid #1f2937; color: #cbd5e1; vertical-align: middle; }
+        .leaderboard-table tr.highlight-user { background: rgba(56, 189, 248, 0.1); font-weight: bold; }
+        .leaderboard-table tr.highlight-user td { color: #38bdf8; }
+
+        /* --- ESTILOS COMPONENTE DASHBOARD DEVELOPER --- */
+        .auth-panel { text-align: center; padding: 40px; background: #070a12; border: 1px solid #ef4444; border-radius: 8px; max-width: 400px; margin: 50px auto; }
+        .dev-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .dev-input-card { background: #070a12; border: 1px solid #eab308; padding: 15px; border-radius: 6px; }
+        .dev-input-card label { display: block; font-size: 11px; text-transform: uppercase; color: #eab308; font-weight: bold; margin-bottom: 8px; }
+        .dev-control-input { background: #1f2937; border: 1px solid #4b5563; color: #fff; padding: 6px 10px; border-radius: 4px; width: 85%; font-family: monospace; font-size: 16px; }
+        .dev-action-btn { background: #eab308; color: #090d16; border: none; font-weight: bold; padding: 12px 24px; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; width: 100%; transition: background 0.3s; }
+        .dev-action-btn:hover { background: #ca8a04; }
+        .crud-table-input { background: #1f2937; border: 1px solid #4b5563; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 13px; width: 90%; }
+
+        @media print {
+            .nav-container, .tab-radio, .content-sim, .content-dev, .header-wrapper, .tutorial-hub { display: none !important; }
+            .page { display: block !important; page-break-after: always; padding: 0; margin: 0; box-shadow: none; background: transparent; }
+            .scroll-reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
+            body { background-color: #fff !important; color: #000 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-wrapper">
+        <div class="project-title">Smart Number Guesser v4.0 Archetype</div>
+        <div class="profile-box">
+            <div>👤 Jugador: <strong id="display-profile-name">Tú (Magister)</strong></div>
+            <div style="border-left: 1px solid #1f2937; padding-left: 15px; display: flex; align-items: center; gap: 8px;">
+                <input type="text" id="profile-nick-input" class="profile-input" placeholder="Nuevo nick...">
+                <input type="text" id="profile-token-auth" class="profile-input" placeholder="Token" style="width: 60px; border-color: #3b82f6;">
+                <button id="profile-save-btn" style="background: #3b82f6; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px;">Cambiar</button>
+            </div>
+            <div style="font-size: 10px; color: #9ca3af;">
+                Token de Sesión (Stateless): <span id="session-token-label" class="badge" style="color:#60a5fa;">ST-0000</span>
+            </div>
+        </div>
+    </div>
+
+    <input type="radio" id="btn-doc1" name="doc-tabs" class="tab-radio" checked="checked">
+    <input type="radio" id="btn-doc2" name="doc-tabs" class="tab-radio">
+    <input type="radio" id="btn-bugs" name="doc-tabs" class="tab-radio">
+    <input type="radio" id="btn-sim" name="doc-tabs" class="tab-radio">
+    <input type="radio" id="btn-dev" name="doc-tabs" class="tab-radio">
+
+    <div class="nav-container">
+        <label for="btn-doc1" class="tab-label label-doc1">📄 Resumen Ejecutivo</label>
+        <label for="btn-doc2" class="tab-label label-doc2">⚙️ Guía del Código</label>
+        <label for="btn-bugs" class="tab-label label-bugs">🛠️ Desafíos y Bugs</label>
+        <label for="btn-sim" class="tab-label label-sim">🎮 Simulador en Vivo</label>
+        <label for="btn-dev" class="tab-label label-dev" style="color: #eab308; border-bottom: 2px dashed rgba(234, 179, 8, 0.3);">💻 Dashboard Developer</label>
+    </div>
+
+    <div class="main-content">
+
+        <div class="page content-doc1">
+            <h1>Resumen Ejecutivo del Proyecto</h1>
+            
+            <div class="meta-box">
+                <p>SISTEMA: Smart Number Guesser v4.0 (Motor Web Adaptativo)</p>
+                <p>ARQUITECTURA: Java EE 8 / JSF 2.2 / GlassFish 5.0 (NetBeans IDE)</p>
+                <p>MECÁNICA: Gamificación Punitiva y Capa de Tributo Histórico</p>
+            </div>
+
+            <div class="scroll-reveal">
+                <h2>1. Resumen Operativo</h2>
+                <p>La nueva actualización del motor <strong>Smart Number Guesser</strong> introduce mecánicas de control de comportamiento estrictas y una capa de feedback contextualizada en la historia de las ciencias de la computación. El sistema optimiza la experiencia del usuario purgando las interfaces nativas toscas de JavaServer Faces y transformando los errores de validación en componentes inmersivos de la narrativa del software.</p>
+            </div>
+
+            <div class="scroll-reveal">
+                <h2>2. Lógica de Penalización por Reincidencia (Sistema Punitivo)</h2>
+                <p>Para mitigar conductas automatizadas de juego o el spam de peticiones síncronas, el motor descarta el bloqueo pasivo y adopta un enfoque punitivo dinámico. Cuando el usuario genera un movimiento inválido (fuera de los rangos numéricos establecidos) o repite de manera consecutiva el mismo número evaluado previamente, el backend intercepta la transacción, emite una alerta y <strong>deduce automáticamente un corazón de vida de forma consecutiva</strong>. Esta penalización se mantiene activa en cada intento idéntico, pudiendo provocar un Game Over fulminante si el jugador insiste en el patrón erróneo.</p>
+            </div>
+
+            <div class="scroll-reveal">
+                <h2>3. Sanitización de Excepciones y Errores de Presentación</h2>
+                <p>Las trazas de error nativas del ciclo de vida de JSF (como <span class="badge">gameForm:j_idt19: Error de validación</span>) exponen vulnerabilidades de la arquitectura y degradan la UI. El sistema implementa un filtro interceptor en la fase de validación del contexto que captura estas excepciones y las formatea en tiempo de ejecución, encapsulando las advertencias bajo strings sanitizados y de estilo corporativo que eliminan los identificadores internos del árbol de componentes.</p>
+            </div>
+
+            <div class="scroll-reveal">
+                <h2>4. Motor de Proximidad Temático (Tributos de Software Libre)</h2>
+                <p>El termómetro de proximidad matemático evoluciona hacia un sistema de recompensas culturales. Al estrecharse la distancia absoluta con el número secreto, el sistema lanza referencias a leyendas de la programación, creadores de Linux y matemáticos:</p>
+                <ul>
+                    <li><strong>Rango Núcleo (Distancia 1-3):</strong> <em>"Nivel Linus Torvalds / Ada Lovelace"</em>. Compilación perfecta, estás a nivel de Kernel o tocando el primer algoritmo de la historia.</li>
+                    <li><strong>Rango Compilador (Distancia 4-8):</strong> <em>"Nivel Dennis Ritchie / Alan Turing"</em>. Estructura e ingenio puro, descifrando el enigma del backend.</li>
+                    <li><strong>Rango Scripting (Distancia 9-15):</strong> <em>"Nivel Grace Hopper / Richard Stallman"</em>. El bug está localizado y el software libre te respalda.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="page content-doc2">
+            <h1>Guía Técnica de Defensa del Código</h1>
+            
+            <div class="meta-box">
+                <p>ARCHIVO COMPILADO: AdivinaBean.java (262 Líneas)</p>
+                <p>BLOQUE MODIFICADO: Capa de Validación y Máquina de Estados</p>
+                <p>ENFOQUE: Defensa ante Preguntas del Tribunal Docente</p>
+            </div>
+
+            <div class="scroll-reveal">
+                <h2>Sección 1: Intercepción y Castigo del Loophole (Método procesarIntento)</h2>
+                <p>El método central de procesamiento ejecuta una validación de estado comparativa al recibir la petición del cliente:</p>
+                <ul>
+                    <li><strong>Estructura Recursive de Descuento:</strong> El código inspecciona el fin de la colección <span class="badge">intentosPartidaActual</span>. Si el valor entrante es idéntico al último índice registrado, se dispara el bloque de penalización: se ejecuta un decremento directo <span class="badge">vidasRestantes--</span> y se actualiza el estado de la UI. Si el usuario presiona el botón repetidamente con el mismo número, el flujo reduce las vidas de forma lineal en cada ciclo de petición hasta invocar el método <span class="badge">bajarVida()</span> por muerte súbita.</li>
+                </ul>
+            </div>
+
+            <div class="scroll-reveal">
+                <h2>Sección 2: Sanitización de Trazas JSF y Captura de Tipos</h2>
+                <p>Para anular los mensajes crudos generados por los validadores nativos de JSF (<span class="badge">&lt;f:validateLongRange&gt;</span>), se modificó el manejo de contextos:</p>
+                <ul>
+                    <li><strong>Sobreescritura de Clientes:</strong> Mediante la manipulación del <span class="badge">FacesContext.getCurrentInstance()</span>, el backend intercepta los mensajes de error de los IDs de los inputs y limpia los strings residuales del framework. Esto transforma la salida técnica en alertas del tipo: <em>"Aviso del Sistema: Parámetros fuera de los límites de computación permitidos."</em></li>
+                </ul>
+            </div>
+
+            <div class="scroll-reveal">
+                <h2>Sección 3: Mapeo del Motor de Proximidad Histórico (calcularFeedbackCalor)</h2>
+                <p>La lógica del método <span class="badge">calcularFeedbackCalor()</span> fue reestructurada mediante un switch analítico basado en el error absoluto:</p>
+                <ul>
+                    <li><strong>Distancia Matemática vs Hito de Ingeniería:</strong> Si la distancia es <span class="badge">&lt;= 3</span>, el backend asigna a la variable string el tributo a <strong>Linus Torvalds o Ada Lovelace</strong>. Para distancias medianas se inyectan dinámicamente referencias a <strong>Dennis Ritchie</strong> (creador de C) o <strong>Alan Turing</strong>. Esto demuestra al tribunal docente el acoplamiento exitoso de lógica algorítmica con el manejo dinámico de variables de presentación de texto.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="page content-bugs">
+            <h1>Bitácora de Desafíos, Limitaciones y Hackeo de Entorno</h1>
+            
+            <div class="meta-box">
+                <p>ENTORNO INTEGRADO: NetBeans IDE / GlassFish Server Architecture / JavaServer Faces</p>
+                <p>DIAGNÓSTICO ARQUITECTÓNICO: Rupturas en Ciclo de Vida y DOM Reset</p>
+                <p>ESTADO OPERATIVO: Solución Estable de Ingeniería al 99.9%</p>
+            </div>
+
+            <div class="scroll-reveal">
+                <h2>Desafío 1: El Bug de las Vidas Infinitas (Evasión del Ciclo de Vida de JSF)</h2>
+                <p><strong>El Conflicto:</strong> Al ingresar valores no numéricos ("hola", combinaciones sin sentido como "dFJ") o números astronómicos fuera del límite máximo (v.g., -4,000 millones), el sistema mostraba mensajes informativos en la pantalla, pero **no restaba corazones**. El backend era incapaz de penalizar la obstinación del jugador.</p>
+                <p><strong>La Razón Técnico:</strong> El ciclo de vida nativo de una petición en JSF consta de 6 fases secuenciales. Cuando la propiedad del Bean estaba mapeada a un tipo numérico primitivo (<span class="badge">int</span>), el motor JSF intentaba parsear la cadena en la <strong>Fase 3 (Process Validations)</strong>. Al detectar la incompatibilidad del texto o el desbordamiento de memoria, JSF abortaba el flujo de inmediato, saltando directo a la Fase 6 (Render Response). Al hacer este bypass, <strong>nunca se llegaba a ejecutar la Fase 5 (Invoke Application)</strong>, que es donde vive nuestro método Java de negocio. Por lo tanto, el código que reducía los corazones jamás se invocaba.</p>
+                <p><strong>La Solución Aplicada:</strong> Rompimos la limitación transformando el modelo en un tipo <span class="badge">String</span> puro. Al hacer esto, JSF permite el paso de cualquier cadena a través de la Fase 3 sin alterarse. Forzamos la entrada directa hasta la Fase 5, donde archivamos el control total mediante un bloque defensivo corporativo de tipo <span class="badge">try-catch (NumberFormatException)</span>. Ahora, nosotros atrapamos la basura en bruto, lanzamos el mensaje sanitizado y descontamos la vida con éxito rotundo.</p>
+            </div>
+
+            <div class="scroll-reveal">
+                <h2>Desafío 2: Pérdida Caótica de Foco en Peticiones AJAX Parciales</h2>
+                <p><strong>El Conflicto:</strong> Tras disparar una validación dinámica por teclado presionando la tecla Enter, el cuadro de entrada de texto se limpiaba correctamente, pero perdía el cursor por completo. El jugador se veía obligado a usar el ratón para hacer clic de nuevo en el cuadro antes de escribir, arruinando la fluidez del ritmo arcade.</p>
+                <p><strong>La Razón Técnica:</strong> El componente asíncrono `<f:ajax>` de JSF optimiza el tráfico de red mediante el re-renderizado selectivo del DOM (`render="@form"`). No obstante, el servidor destruye físicamente el nodo del árbol HTML original del cliente y lo reemplaza con un fragmento nuevo con los estados actualizados. Al destruir el elemento activo en el navegador, el sistema operativo pierde la referencia del cursor del teclado, dejando la pantalla deseleccionada.</p>
+                <p><strong>La Solución Aplicada:</strong> Desarrollamos un puente reactivo mediante un script especializado acoplado al callback de ejecución Ajax de JSF utilizando la directiva <span class="badge">onevent="mantenerFocoTeclado"</span>. Esta función intercepta los eventos de red de bajo nivel. Cuando el estado de la comunicación asíncrona pasa a ser exitoso (<span class="badge">success</span>), la API de JavaScript inyecta de nuevo el foco de hardware y la selección física (<span class="badge">focus()</span> y <span class="badge">select()</span>) en el identificador del nuevo componente inyectado por el servidor de aplicaciones.</p>
+            </div>
+
+            <div class="scroll-reveal">
+                <h2>Desafío 3: El Reinicio Inesperado del Formulario ("Enter Suicida")</h2>
+                <p><strong>El Conflicto:</strong> Al presionar Enter dentro del cuadro de texto para comprobar rápidamente un número, la aplicación web reiniciaba de forma aleatoria la partida completa, alterando los rangos y regenerando el número secreto, borrando los datos históricos acumulados por el usuario.</p>
+                <p><strong>La Razón Técnica:</strong> Con base en los estándares globales de procesamiento de formularios HTML5, si un usuario presiona la tecla Enter dentro de una caja de entrada, el navegador web interpreta que se quiere realizar un envío físico de todo el contexto, detonando de forma implícita el *primer botón declarativo de acción* que encuentre de arriba a abajo. En nuestra primera maqueta unificada en NetBeans, el primer botón de la página era el de "Reiniciar Partida", provocando que el Enter llamara a la función destructora en lugar de la evaluadora.</p>
+                <p><strong>La Solución Aplicada:</strong> Diseñamos un desacoplamiento arquitectónico en la vista dividiendo el árbol de componentes en dos formularios herméticos y aislados: <span class="badge">configForm</span> (gestión del estado inicial y menús) y <span class="badge">gameForm</span> (bucle interactivo). Adicionalmente, inyectamos un script en línea en el evento <span class="badge">onkeypress</span> que filtra el código de tecla <span class="badge">13 (Enter)</span>, desviando la señal nativa hacia el disparador controlado del botón asíncrono y cancelando la recarga del navegador.</p>
+            </div>
+        </div>
+
+        <div class="page content-sim">
+            <h1>🎮 Simulador en Vivo de Mecánicas</h1>
+            <p>Entorno interactivo gamificado. Pasa el cursor sobre los iconos de ayuda <span class="help-icon">?</span> para auditar las reglas lógicas del backend.</p>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div id="stat-wins" class="stat-val">0</div>
+                    <div class="stat-lbl">Ganadas</div>
+                </div>
+                <div class="stat-card">
+                    <div id="stat-losses" class="stat-val">0</div>
+                    <div class="stat-lbl">Perdidas</div>
+                </div>
+                <div class="stat-card">
+                    <div id="stat-winrate" class="stat-val">0%</div>
+                    <div class="stat-lbl">Win Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div id="stat-streak" class="stat-val">0</div>
+                    <div class="stat-lbl">Racha</div>
+                </div>
+                <div class="stat-card">
+                    <div id="stat-score" class="stat-val">0 pts</div>
+                    <div class="stat-lbl">Puntuación</div>
+                </div>
+            </div>
+
+            <div class="game-box">
+                <div style="margin-bottom: 25px; background: #111827; padding: 12px; border-radius: 6px; border: 1px solid #1f2937;">
+                    <label for="sim-nivel" style="font-weight: bold; color: #38bdf8; font-size: 14px;">CONFIGURAR ENTORNO: </label>
+                    <select id="sim-nivel" style="background: #1f2937; color: #fff; border: 1px solid #4b5563; padding: 6px 12px; border-radius: 4px; font-weight: bold; outline: none;">
+                        <option value="BASICO">BÁSICO (0 - 99)</option>
+                        <option value="INTERMEDIO">INTERMEDIO (100 - 500)</option>
+                        <option value="AVANZADO">AVANZADO (500 - 1000)</option>
+                    </select>
+                    <button id="reset-sim-btn" style="background: #34d399; color: #090d16; border: none; padding: 6px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-left: 15px; font-size: 13px;">REINICIAR HILOS</button>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div class="hearts" id="hearts-display">❤️ ❤️ ❤️ ❤️ ❤️</div>
+                </div>
+                
+                <div>
+                    <input type="text" id="player-input" class="game-input" placeholder="Introduce jugada...">
+                    <button id="submit-btn" class="game-btn">Probar Número</button>
+                </div>
+                
+                <div>
+                    <div id="console-log" class="console-output msg-normal">Sistema listo. Atajo cargado: [Doble Enter] para reiniciar hilos.</div>
+                </div>
+            </div>
+
+            <div class="leaderboard-box">
+                <div class="leaderboard-title">🏆 Tabla de Clasificación Global (Histórico del Servidor)</div>
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rango</th>
+                            <th>Hacker / Developer</th>
+                            <th>Puntuación</th>
+                            <th>Estado de Memoria</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="page content-dev">
+            <div id="dev-auth-gate" class="auth-panel">
+                <h3 style="color: #ef4444; margin-top: 0; text-transform: uppercase; font-size: 14px; letter-spacing: 2px;">🔓 Autenticación Requerida</h3>
+                <p style="font-size: 13px; color: #9ca3af;">Introduce la credencial maestra del entorno de experimentación.</p>
+                <input type="password" id="dev-pass-input" class="game-input" style="font-size: 16px; padding: 8px; width: 80%; border-color: #ef4444; margin-bottom: 20px;" placeholder="Password...">
+                <button id="dev-auth-btn" class="dev-action-btn" style="background: #ef4444; color: white;">Verificar Credencial</button>
+                <p id="dev-auth-error" style="color: #f87171; font-size: 12px; margin-top: 15px; display: none; font-weight: bold;">❌ Acceso denegado: Firma criptográfica errónea.</p>
+            </div>
+
+            <div id="dev-dashboard-panel" style="display: none;">
+                <h1>⚙️ Dashboard Developer (God Mode Active)</h1>
+                <div class="meta-box" style="border-left-color: #eab308;">
+                    <p style="color: #eab308; text-transform: uppercase; letter-spacing: 1px;">⚠️ ADVERTENCIA: Esto solamente es para efectos de experimentación al añadir nuevas funciones.</p>
+                    <p style="font-size: 12px; margin-top: 5px;">Tienes control bruto y directo sobre el árbol de estados interno de la memoria volátil.</p>
+                </div>
+
+                <div style="background: #070a12; border: 1px solid #1f2937; padding: 15px; border-radius: 6px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <span style="font-weight: bold; color: #eab308;">Modificar Clave de Acceso Dev:</span>
+                        <div style="font-size: 11px; color: #9ca3af; margin-top: 2px;">Debido a la naturaleza <em>stateless</em> del cliente, se restaurará a 1337 tras refrescar.</div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="dev-new-pass-input" class="crud-table-input" style="width: 120px;" placeholder="Nueva clave...">
+                        <button id="dev-save-pass-btn" style="background: #1f2937; border: 1px solid #eab308; color: #eab308; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Cambiar</button>
+                    </div>
+                </div>
+
+                <h2>1. Manipular Métricas de Sesión</h2>
+                <div class="dev-grid">
+                    <div class="dev-input-card">
+                        <label>Partidas Ganadas</label>
+                        <input type="number" id="dev-set-wins" class="dev-control-input" value="0">
+                    </div>
+                    <div class="dev-input-card">
+                        <label>Partidas Perdidas</label>
+                        <input type="number" id="dev-set-losses" class="dev-control-input" value="0">
+                    </div>
+                    <div class="dev-input-card">
+                        <label>Racha de Victorias</label>
+                        <input type="number" id="dev-set-streak" class="dev-control-input" value="0">
+                    </div>
+                    <div class="dev-input-card">
+                        <label>Puntuación Total</label>
+                        <input type="number" id="dev-set-score" class="dev-control-input" value="0">
+                    </div>
+                    <div class="dev-input-card">
+                        <label>Corazones (Vidas)</label>
+                        <input type="number" id="dev-set-lives" class="dev-control-input" value="5">
+                    </div>
+                    <div class="dev-input-card" style="border-color: #34d399;">
+                        <label style="color: #34d399;">Número Secreto Actual</label>
+                        <input type="number" id="dev-set-target" class="dev-control-input" style="border-color: #34d399; color: #34d399;" value="0">
+                    </div>
+                </div>
+
+                <h2>2. CRUD y Edición de la Tabla de Clasificación Global</h2>
+                <div style="background: #070a12; padding: 20px; border-radius: 8px; border: 1px solid #1f2937; margin-bottom: 30px;">
+                    <table class="leaderboard-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%;">Hacker / Developer</th>
+                                <th style="width: 25%;">Puntuación (pts)</th>
+                                <th style="width: 25%;">Estado de Memoria</th>
+                                <th style="width: 10%; text-align: center;">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dev-crud-tbody">
+                            </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #1f2937; display: flex; gap: 10px;">
+                        <input type="text" id="add-hacker-name" class="crud-table-input" placeholder="Nombre (v.g., Choc Network)...">
+                        <input type="number" id="add-hacker-score" class="crud-table-input" style="width: 120px;" placeholder="Puntos...">
+                        <input type="text" id="add-hacker-status" class="crud-table-input" placeholder="Estado (v.g., SysAdmin)...">
+                        <button id="add-hacker-btn" style="background: #34d399; color: #090d16; border: none; font-weight: bold; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap;">＋ Añadir Registro</button>
+                    </div>
+                </div>
+
+                <button id="dev-push-master-btn" class="dev-action-btn">🚀 Sincronizar y Desplegar Cambios al Simulador</button>
+                <div id="dev-push-success-msg" style="color: #34d399; font-weight: bold; text-align: center; margin-top: 12px; display: none; font-size: 13px;">
+                    ✨ Inyección completada. Los hilos del simulador de producción han sido reconfigurados con éxito.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // --- CONTEXTO TRANSACCIONAL STATELESS (TOKEN VOLÁTIL) ---
+            const tokenAleatorio = "ST-" + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById("session-token-label").innerText = tokenAleatorio;
+
+            // --- REVEAL ANIMATIONS INTERSECTION OBSERVER ---
+            const observerOptions = { root: null, rootMargin: "0px 0px -80px 0px", threshold: 0.15 };
+            const scrollObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add("visible"); });
+            }, observerOptions);
+            document.querySelectorAll(".scroll-reveal").forEach(el => scrollObserver.observe(el));
+
+            // --- REGISTROS MAESTROS (PRODUCCIÓN) ---
+            let targetNumber;
+            let lives = 5;
+            let lastInput = null;
+            let rangoMin = 0;
+            let rangoMax = 99;
+            let juegoTerminado = false;
+
+            let totalWins = 0;
+            let totalLosses = 0;
+            let currentStreak = 0;
+            let totalScore = 0;
+            let currentUsername = "Tú (Magister)";
+
+            let devPassword = "1337"; // Llave maestra mutable en memoria volátil
+
+            // BASE DE DATOS MUTABLE DE LA COMUNIDAD (LEADERBOARD)
+            let baseLeaderboard = [
+                { name: "Linus Torvalds", score: 2500, status: "Kernel Overlord" },
+                { name: "Savitar (S4vitar)", score: 1900, status: "Uid 0 / Root Kali 🐉" },
+                { name: "NetworkChuck", score: 1500, status: "Subnet Master ☕" },
+                { name: "MoureDev", score: 1200, status: "FullStack MVP 💻" },
+                { name: "Ada Lovelace", score: 950, status: "First Algorithm" }
+            ];
+
+            // VARIABLES REPLICADAS DEL ENTORNO DEVELOPER
+            let devLeaderboardCopy = JSON.parse(JSON.stringify(baseLeaderboard));
+
+            // ELEMENTOS INTERFAZ PERFIL
+            const profileNickInput = document.getElementById("profile-nick-input");
+            const profileTokenAuth = document.getElementById("profile-token-auth");
+            const profileSaveBtn = document.getElementById("profile-save-btn");
+            const displayProfileName = document.getElementById("display-profile-name");
+
+            // DOM SIMULADOR
+            const nivelSelect = document.getElementById("sim-nivel");
+            const resetBtn = document.getElementById("reset-sim-btn");
+            const inputEl = document.getElementById("player-input");
+            const btnEl = document.getElementById("submit-btn");
+            const heartsEl = document.getElementById("hearts-display");
+            const consoleEl = document.getElementById("console-log");
+
+            const statWinsEl = document.getElementById("stat-wins");
+            const statLossesEl = document.getElementById("stat-losses");
+            const statWinrateEl = document.getElementById("stat-winrate");
+            const statStreakEl = document.getElementById("stat-streak");
+            const statScoreEl = document.getElementById("stat-score");
+            const leaderboardBody = document.getElementById("leaderboard-body");
+
+            // DOM DEV GATE & PANEL
+            const devPassInput = document.getElementById("dev-pass-input");
+            const devAuthBtn = document.getElementById("dev-auth-btn");
+            const devAuthError = document.getElementById("dev-auth-error");
+            const devAuthGate = document.getElementById("dev-auth-gate");
+            const devDashboardPanel = document.getElementById("dev-dashboard-panel");
+            const devNewPassInput = document.getElementById("dev-new-pass-input");
+            const devSavePassBtn = document.getElementById("dev-save-pass-btn");
+
+            // INPUTS DE CONFIGURACIÓN DEVELOPER
+            const devSetWins = document.getElementById("dev-set-wins");
+            const devSetLosses = document.getElementById("dev-set-losses");
+            const devSetStreak = document.getElementById("dev-set-streak");
+            const devSetScore = document.getElementById("dev-set-score");
+            const devSetLives = document.getElementById("dev-set-lives");
+            const devSetTarget = document.getElementById("dev-set-target");
+            const devCrudTbody = document.getElementById("dev-crud-tbody");
+            const devPushMasterBtn = document.getElementById("dev-push-master-btn");
+            const devPushSuccessMsg = document.getElementById("dev-push-success-msg");
+
+            // GESTIÓN DE PERFIL CON VALIDACIÓN STATELESS
+            profileSaveBtn.addEventListener("click", () => {
+                const tokenIngresado = profileTokenAuth.value.trim();
+                const nuevoNick = profileNickInput.value.trim();
+
+                if (tokenIngresado !== tokenAleatorio) {
+                    alert("❌ Token Criptográfico inválido para esta sesión. Intromisión bloqueada.");
+                    return;
+                }
+                if (nuevoNick === "") {
+                    alert("⚠️ Especifica un alias válido.");
+                    return;
+                }
+
+                currentUsername = nuevoNick;
+                displayProfileName.innerText = currentUsername;
+                profileNickInput.value = "";
+                profileTokenAuth.value = "";
+                actualizarTablerosYClasificacion();
+            });
+
+            // GESTIÓN DE AUTENTICACIÓN DEVELOPER
+            devAuthBtn.addEventListener("click", () => {
+                if (devPassInput.value === devPassword) {
+                    devAuthGate.style.display = "none";
+                    devDashboardPanel.style.display = "block";
+                    devAuthError.style.display = "none";
+                    cargarDatosEnDashboardDev();
+                } else {
+                    devAuthError.style.display = "block";
+                }
+            });
+
+            devSavePassBtn.addEventListener("click", () => {
+                const nuevaClave = devNewPassInput.value.trim();
+                if (nuevaClave !== "") {
+                    devPassword = nuevaClave;
+                    alert(`🔑 Clave Dev cambiada con éxito. Nueva clave activa en este hilo: ${devPassword}`);
+                    devNewPassInput.value = "";
+                }
+            });
+
+            // INICIALIZADOR DE PRODUCCIÓN
+            function inicializarEntorno() {
+                const nivel = nivelSelect.value;
+                if (nivel === "BASICO") { rangoMin = 0; rangoMax = 99; }
+                else if (nivel === "INTERMEDIO") { rangoMin = 100; rangoMax = 500; }
+                else if (nivel === "AVANZADO") { rangoMin = 500; rangoMax = 1000; }
+
+                targetNumber = Math.floor(Math.random() * (rangoMax - rangoMin + 1)) + rangoMin;
+                lives = 5;
+                lastInput = null;
+                juegoTerminado = false;
+
+                updateHeartsUI();
+                actualizarTablerosYClasificacion();
+                
+                inputEl.value = "";
+                setTimeout(() => inputEl.focus(), 50);
+            }
+
+            function updateHeartsUI() {
+                // Soporta renderizar más de 5 corazones si el dev los inyecta
+                if (lives > 15) {
+                    heartsEl.innerHTML = `❤️ x${lives} 🔥 (God Mode)`;
+                } else {
+                    heartsEl.innerHTML = "❤️ ".repeat(Math.max(0, lives)) + "🖤 ".repeat(Math.max(0, 5 - lives));
+                }
+            }
+
+            function actualizarTablerosYClasificacion() {
+                // Cálculo de Win Rate: (Wins / Total) * 100
+                const totalPartidas = totalWins + totalLosses;
+                const winRate = totalPartidas > 0 ? ((totalWins / totalPartidas) * 100).toFixed(1) : "0.0";
+
+                statWinsEl.innerText = totalWins;
+                statLossesEl.innerText = totalLosses;
+                statWinrateEl.innerText = winRate + "%";
+                statStreakEl.innerText = currentStreak;
+                statScoreEl.innerText = totalScore + " pts";
+
+                // Combinación del stack global con la sesión del cliente
+                let listaExtendida = [...baseLeaderboard];
+                listaExtendida.push({ name: currentUsername, score: totalScore, status: "Active Client Session", isUser: true });
+                
+                listaExtendida.sort((a, b) => b.score - a.score);
+
+                leaderboardBody.innerHTML = "";
+                listaExtendida.forEach((hacker, index) => {
+                    const row = document.createElement("tr");
+                    if (hacker.isUser) row.className = "highlight-user";
+                    
+                    row.innerHTML = `
+                        <td><strong>#${index + 1}</strong></td>
+                        <td>${hacker.name}</td>
+                        <td>${hacker.score} pts</td>
+                        <td><span class="badge" style="color: ${hacker.isUser ? '#38bdf8' : '#34d399'}">${hacker.status}</span></td>
+                    `;
+                    leaderboardBody.appendChild(row);
+                });
+            }
+
+            function printLog(text, type) {
+                consoleEl.className = "console-output " + type;
+                consoleEl.innerText = text;
+            }
+
+            // MOTOR JUEGO DE PRODUCCIÓN
+            function processGuess() {
+                if (juegoTerminado) {
+                    printLog(`🚨 Hilo actual bloqueado. Usa el comando [Doble Enter] o clica 'REINICIAR HILOS' para purgar la caché.`, "msg-error");
+                    return;
+                }
+
+                const rawInput = inputEl.value;
+
+                try {
+                    if (rawInput === null || rawInput.trim() === "") {
+                        bajarVida();
+                        printLog("⚠️ Validación: Buffer vacío detectado. Reduciendo un corazón de control.", "msg-error");
+                        return;
+                    }
+
+                    const parsedValue = Number(rawInput.trim());
+                    if (isNaN(parsedValue) || !/^-?\d+$/.test(rawInput.trim())) {
+                        bajarVida();
+                        printLog(`⚠️ Error de Tipo: Formato de cadena inválido. El Escudo de Strings protegió el backend. [-1 Corazón]`, "msg-error");
+                        return;
+                    }
+
+                    const value = parseInt(rawInput.trim(), 10);
+
+                    if (value < rangoMin || value > rangoMax) {
+                        bajarVida();
+                        printLog(`❌ Límites superados: ${value} está fuera de la matriz lógica asignada (${rangoMin}-${rangoMax}).`, "msg-error");
+                        return;
+                    }
+
+                    if (rawInput.trim() === lastInput) {
+                        bajarVida();
+                        printLog(`🚨 Bucle Punitivo: Reincidencia consecutiva del número ${value}. Modificación rechazada. [-1 Corazón]`, "msg-error");
+                        return;
+                    }
+
+                    lastInput = rawInput.trim();
+                    const distance = Math.abs(value - targetNumber);
+
+                    if (value === targetNumber) {
+                        juegoTerminado = true;
+                        totalWins++;
+                        currentStreak++;
+                        const recompensa = 100 + (lives * 20);
+                        totalScore += recompensa;
+                        
+                        printLog(`🎉 ¡ÉXITO! Compilación perfecta. El número secreto era ${targetNumber}. Añadidos +${recompensa} pts.`, "msg-geek");
+                        actualizarTablerosYClasificacion();
+                        return;
+                    }
+
+                    let trackClue = value < targetNumber ? "MAYOR" : "MENOR";
+                    let feedbackHistorico = "";
+
+                    if (distance <= 3) {
+                        feedbackHistorico = `🔥 Hierve. Nivel Linus Torvalds / Ada Lovelace.`;
+                    } else if (distance <= 8) {
+                        feedbackHistorico = `⚡ Caliente. Nivel Dennis Ritchie / Alan Turing.`;
+                    } else if (distance <= 15) {
+                        feedbackHistorico = `💡 Tibio. Nivel Grace Hopper / Savitar.`;
+                    } else {
+                        feedbackHistorico = `❄️ Congelado. Más perdido que el entorno gráfico de Cali sin terminal.`;
+                    }
+
+                    bajarVida();
+                    if (!juegoTerminado) {
+                        printLog(`Intento fallido. El número es ${trackClue} que ${value}. ${feedbackHistorico}`, "msg-normal");
+                    }
+
+                } finally {
+                    inputEl.value = "";
+                    inputEl.focus();
+                }
+            }
+
+            function bajarVida() {
+                if (lives > 0) lives--;
+                updateHeartsUI();
+                if (lives <= 0) {
+                    juegoTerminado = true;
+                    totalLosses++;
+                    currentStreak = 0;
+                    totalScore = Math.max(0, totalScore - 50);
+                    printLog(`🚨 GAME OVER. Sesión cerrada por falta de vidas. Se restaron 50 pts del histórico. El número era el ${targetNumber}.`, "msg-error");
+                    actualizarTablerosYClasificacion();
+                }
+            }
+
+            // INTERCEPCIÓN SHORTCUT: DOBLE ENTER
+            let lastEnterTimeStamp = 0;
+            inputEl.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    const now = Date.now();
+                    const diferenciaTiempo = now - lastEnterTimeStamp;
+                    
+                    if (diferenciaTiempo < 300) {
+                        inicializarEntorno();
+                        printLog("🔄 Shortcut activado: ¡Hilo reiniciado automáticamente por comando Doble Enter!", "msg-geek");
+                        lastEnterTimeStamp = 0;
+                        return;
+                    }
+                    
+                    lastEnterTimeStamp = now;
+                    btnEl.click();
+                }
+            });
+
+            // --- OPERACIONES DEL ENTORNO DE DESARROLLO (DEV DASHBOARD) ---
+            function cargarDatosEnDashboardDev() {
+                devSetWins.value = totalWins;
+                devSetLosses.value = totalLosses;
+                devSetStreak.value = currentStreak;
+                devSetScore.value = totalScore;
+                devSetLives.value = lives;
+                devSetTarget.value = targetNumber;
+
+                // Crear copia espejo para el CRUD de la tabla
+                devLeaderboardCopy = JSON.parse(JSON.stringify(baseLeaderboard));
+                renderizarCrudLeaderboard();
+            }
+
+            function renderizarCrudLeaderboard() {
+                devCrudTbody.innerHTML = "";
+                devLeaderboardCopy.forEach((hacker, index) => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td><input type="text" class="crud-table-input" value="${hacker.name}" data-index="${index}" data-field="name"></td>
+                        <td><input type="number" class="crud-table-input" value="${hacker.score}" data-index="${index}" data-field="score"></td>
+                        <td><input type="text" class="crud-table-input" value="${hacker.status}" data-index="${index}" data-field="status"></td>
+                        <td style="text-align: center;"><button class="dev-delete-row-btn" data-index="${index}" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Eliminar</button></td>
+                    `;
+                    devCrudTbody.appendChild(row);
+                });
+
+                // Escuchar cambios reactivos en los inputs del CRUD
+                devCrudTbody.querySelectorAll(".crud-table-input").forEach(input => {
+                    input.addEventListener("input", (e) => {
+                        const idx = e.target.getAttribute("data-index");
+                        const field = e.target.getAttribute("data-field");
+                        let val = e.target.value;
+                        if (field === "score") val = parseInt(val, 10) || 0;
+                        devLeaderboardCopy[idx][field] = val;
+                    });
+                });
+
+                // Escuchar acciones de eliminación
+                devCrudTbody.querySelectorAll(".dev-delete-row-btn").forEach(button => {
+                    button.addEventListener("click", (e) => {
+                        const idx = e.target.getAttribute("data-index");
+                        devLeaderboardCopy.splice(idx, 1);
+                        renderizarCrudLeaderboard();
+                    });
+                });
+            }
+
+            // Añadir registros de hackers personalizados al clon de desarrollo
+            document.getElementById("add-hacker-btn").addEventListener("click", () => {
+                const nameEl = document.getElementById("add-hacker-name");
+                const scoreEl = document.getElementById("add-hacker-score");
+                const statusEl = document.getElementById("add-hacker-status");
+
+                if (nameEl.value.trim() === "") return alert("Especifica un nombre");
+
+                devLeaderboardCopy.push({
+                    name: nameEl.value.trim(),
+                    score: parseInt(scoreEl.value, 10) || 0,
+                    status: statusEl.value.trim() || "Experimental Node"
+                });
+
+                nameEl.value = "";
+                scoreEl.value = "";
+                statusEl.value = "";
+                renderizarCrudLeaderboard();
+            });
+
+            // BOTÓN MAESTRO DE INYECCIÓN DE ESTADOS AL SIMULADOR DE PRODUCCIÓN
+            devPushMasterBtn.addEventListener("click", () => {
+                // 1. Forzar variables de control de juego
+                totalWins = parseInt(devSetWins.value, 10) || 0;
+                totalLosses = parseInt(devSetLosses.value, 10) || 0;
+                currentStreak = parseInt(devSetStreak.value, 10) || 0;
+                totalScore = parseInt(devSetScore.value, 10) || 0;
+                lives = parseInt(devSetLives.value, 10) || 0;
+                targetNumber = parseInt(devSetTarget.value, 10) || 0;
+
+                // 2. Desplegar los cambios estructurales de la Leaderboard
+                baseLeaderboard = JSON.parse(JSON.stringify(devLeaderboardCopy));
+
+                // 3. Compilar y sincronizar la UI del simulador en vivo
+                updateHeartsUI();
+                actualizarTablerosYClasificacion();
+
+                // Efecto visual de despliegue exitoso
+                devPushSuccessMsg.style.display = "block";
+                setTimeout(() => { devPushSuccessMsg.style.display = "none"; }, 4000);
+            });
+
+            // Listeners de navegación básica del simulador
+            btnEl.addEventListener("click", processGuess);
+            nivelSelect.addEventListener("change", inicializarEntorno);
+            resetBtn.addEventListener("click", inicializarEntorno);
+
+            // Carga inicial limpia
+            inicializarEntorno();
+        });
+    </script>
+</body>
+</html>
