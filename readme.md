@@ -1,30 +1,21 @@
-# Java-Lab: Enterprise Architecture & Lifecycle Sandbox
+# BunkerFinal: Enterprise Lifecycle & Auth Sandbox
 
-A research-oriented repository focusing on Java EE/Jakarta EE lifecycle management, authentication flow control, and component-driven architecture. This lab serves as the testing ground for high-reliability web deployments and legacy integration patterns.
+## 🏛️ Overview
+**BunkerFinal** is a research-oriented repository focusing on Jakarta EE (Java EE) lifecycle management, authentication flow control, and component-driven architecture. This lab serves as the dedicated stress-testing environment for high-reliability web deployments and the reverse-engineering of legacy integration patterns commonly found in enterprise financial systems.
 
----
+## 🌐 The Enterprise Research Suite
 
-## 🏛️ Operational Modules
+This repository is architected into two primary research modules:
 
-### 1. BunkerFinal: Auth & Flow Control
-* **Focus:** Security-first session management and HTTP transaction logic.
-* **Architecture:** JSP-based presentation layer integrated with structured deployment scripts.
-* **Purpose:** Validating state-machine transitions and secure request/response cycles.
+1. **BunkerFinal (Middleware & Auth Control):** Focuses on security-first session management and HTTP transaction logic. It acts as a middleware sandbox for validating state-machine transitions and enforcing secure request/response cycles at the application perimeter.
+2. **SmartNumberGuesser (SNG - Lifecycle Optimization):** A deep-dive analysis of JSF (JavaServer Faces) lifecycle management and asynchronous state management. It provides a blueprint for identifying architectural bottlenecks and component behavior in large-scale enterprise containers.
 
-### 2. SmartNumberGuesser (SNG): Lifecycle Optimization
-* **Focus:** JSF (JavaServer Faces) lifecycle analysis and asynchronous state management.
-* **Architecture:** Component-driven XHTML views paired with high-performance execution patterns.
-* **Engineering Note:** Includes `sng_arch_v4.html`, a reverse-engineering log detailing architectural bottlenecks and component behavior.
-
----
-
-## 🛠️ Repository Blueprint
-
+## 🛠️ Project Structure
 ```text
 java-lab/
-├── 📁 BunkerFinal/             # Auth & Flow Control Module
-│   ├── index.jsp               # Core HTTP/Presentation logic
-│   └── build.xml               # Apache Ant deployment automation
-└── 📁 SmartNumberGuesser/      # JSF Lifecycle Sandbox
-    ├── index.xhtml             # Async component-driven view
-    └── sng_arch_v4.html        # Architectural blueprint & analysis
+├── BunkerFinal/              # Auth & Flow Control Module
+│   ├── index.jsp             # Core HTTP/Presentation logic
+│   └── build.xml             # Apache Ant deployment automation
+└── SmartNumberGuesser/       # JSF Lifecycle Sandbox
+    ├── index.xhtml           # Async component-driven view
+    └── sng_arch_v4.html      # Architectural blueprint & analysis
